@@ -1,73 +1,9 @@
-const API_BASE = "https://middleman-verify1-production.up.railway.app";
 /* ============================
    MIDDLEMAN VERIFY - script.js
+   Terkoneksi ke Backend Railway
    ============================ */
 
-/* ---------- DATABASE (sample data) ---------- */
-const DB = {
-  "RajaMiddle99": {
-    name: "RajaMiddle99",
-    platform: "Tokopedia / Discord",
-    joined: "2021",
-    tx: 312,
-    successRate: 98,
-    reports: 1,
-    score: 94,
-    factors: [
-      { label: "Histori Transaksi",   val: 97, color: "#00ff88" },
-      { label: "Kecepatan Respons",   val: 91, color: "#00ff88" },
-      { label: "Verifikasi Identitas",val: 88, color: "#00d4ff" },
-      { label: "Laporan Negatif",     val: 96, color: "#00ff88" },
-      { label: "Usia Akun",           val: 100,color: "#00ff88" },
-    ],
-    reviews: [
-      { user: "@bintang_jaya",  date: "10 Mar 2026", stars: 5, text: "Cepat, aman, dan profesional. Sudah 5x pakai jasa ini." },
-      { user: "@gamer_sultan",  date: "3 Mar 2026",  stars: 5, text: "Transaksi item game lancar banget. Recommended!" },
-      { user: "@taufiq_id",     date: "20 Feb 2026", stars: 4, text: "Prosesnya sedikit lama tapi aman dan terpercaya." },
-    ]
-  },
-  "MM_Gelap123": {
-    name: "MM_Gelap123",
-    platform: "Instagram / Telegram",
-    joined: "2024",
-    tx: 18,
-    successRate: 61,
-    reports: 7,
-    score: 21,
-    factors: [
-      { label: "Histori Transaksi",   val: 30, color: "#ff3366" },
-      { label: "Kecepatan Respons",   val: 55, color: "#ffaa00" },
-      { label: "Verifikasi Identitas",val: 15, color: "#ff3366" },
-      { label: "Laporan Negatif",     val: 12, color: "#ff3366" },
-      { label: "Usia Akun",           val: 20, color: "#ff3366" },
-    ],
-    reviews: [
-      { user: "@korban_01",   date: "8 Mar 2026", stars: 1, text: "SCAMMER! Uang 500rb dibawa kabur. Hati-hati!" },
-      { user: "@anon_buyer",  date: "1 Mar 2026", stars: 1, text: "Tidak bisa dihubungi setelah transfer." },
-    ]
-  },
-  "TrustMM_Budi": {
-    name: "TrustMM_Budi",
-    platform: "Kaskus / WhatsApp",
-    joined: "2019",
-    tx: 541,
-    successRate: 99,
-    reports: 0,
-    score: 99,
-    factors: [
-      { label: "Histori Transaksi",   val: 99,  color: "#00ff88" },
-      { label: "Kecepatan Respons",   val: 97,  color: "#00ff88" },
-      { label: "Verifikasi Identitas",val: 100, color: "#00ff88" },
-      { label: "Laporan Negatif",     val: 100, color: "#00ff88" },
-      { label: "Usia Akun",           val: 100, color: "#00ff88" },
-    ],
-    reviews: [
-      { user: "@seller_handal",  date: "12 Mar 2026", stars: 5, text: "Legend. Sudah 30+ transaksi. Tidak pernah mengecewakan." },
-      { user: "@trusted_buyer",  date: "9 Mar 2026",  stars: 5, text: "Proses jelas, komunikasi lancar. Terbaik!" },
-      { user: "@buyer_oke",      date: "5 Mar 2026",  stars: 5, text: "MM paling aman yang pernah saya pakai." },
-    ]
-  }
-};
+const API_BASE = "https://middleman-verify1-production.up.railway.app";
 
 /* ---------- STATE ---------- */
 let currentUser  = null;
@@ -78,91 +14,88 @@ async function searchMM() {
   const q = document.getElementById('searchInput').value.trim();
   if (!q) return;
 
+  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('emptyState').style.display  = 'none';
+
   try {
-    const res = await fetch(`${API_BASE}/middlemen/${q}`);
+    const res = await fetch(`${API_BASE}/middlemen/${encodeURIComponent(q)}`);
     if (res.status === 404) {
       renderUnknown(q);
-    } else {
+    } else if (res.ok) {
       const data = await res.json();
-      renderProfile(data);
+      renderProfileFromAPI(data);
+    } else {
+      renderUnknown(q);
     }
   } catch (err) {
     renderUnknown(q);
   }
-
-  document.getElementById('mainContent').style.display = 'block';
-  document.getElementById('emptyState').style.display = 'none';
 }
 
-/* Enter key on search input */
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') searchMM();
 });
 
-/* ---------- RENDER PROFILE ---------- */
-function renderProfile(d) {
+/* ---------- RENDER PROFILE DARI API ---------- */
+function renderProfileFromAPI(d) {
   currentUser = d;
 
-  /* avatar & info */
-  document.getElementById('avatarEl').textContent  = d.name.substring(0, 2).toUpperCase();
-  document.getElementById('profileName').textContent = d.name;
-  document.getElementById('profileMeta').textContent = d.platform + ' · Bergabung ' + d.joined;
+  const trust        = d.trust || {};
+  const score        = trust.score || 0;
+  const totalReports = trust.total_reports || 0;
 
-  /* badge */
+  document.getElementById('avatarEl').textContent    = d.username.substring(0, 2).toUpperCase();
+  document.getElementById('profileName').textContent = d.username;
+  document.getElementById('profileMeta').textContent = d.platform + ' · Bergabung ' + d.joined_year;
+
   const badge = document.getElementById('profileBadge');
-  if (d.score >= 80)      { badge.className = 'profile-badge badge-safe';    badge.textContent = 'TRUSTED'; }
-  else if (d.score >= 50) { badge.className = 'profile-badge badge-warn';    badge.textContent = 'WASPADA'; }
-  else                    { badge.className = 'profile-badge badge-danger';  badge.textContent = 'BERBAHAYA'; }
+  if (score >= 80)      { badge.className = 'profile-badge badge-safe';   badge.textContent = 'TRUSTED'; }
+  else if (score >= 50) { badge.className = 'profile-badge badge-warn';   badge.textContent = 'WASPADA'; }
+  else                  { badge.className = 'profile-badge badge-danger'; badge.textContent = 'BERBAHAYA'; }
 
-  /* alert box */
   const alertBox = document.getElementById('alertBox');
-  alertBox.style.display = d.reports > 3 ? 'flex' : 'none';
-  if (d.reports > 3) {
+  alertBox.style.display = totalReports > 3 ? 'flex' : 'none';
+  if (totalReports > 3) {
     document.getElementById('alertText').textContent =
-      'Akun ini memiliki ' + d.reports + ' laporan penipuan aktif. Sangat disarankan untuk TIDAK melakukan transaksi.';
+      'Akun ini memiliki ' + totalReports + ' laporan penipuan aktif. Sangat disarankan untuk TIDAK melakukan transaksi.';
   }
 
-  /* trust arc */
   const arc    = 289;
-  const offset = arc - (arc * d.score / 100);
+  const offset = arc - (arc * score / 100);
   const arcEl  = document.getElementById('trustArc');
   arcEl.style.strokeDashoffset = offset;
-  const col = d.score >= 80 ? '#00ff88' : d.score >= 50 ? '#ffaa00' : '#ff3366';
+  const col = score >= 80 ? '#00ff88' : score >= 50 ? '#ffaa00' : '#ff3366';
   arcEl.setAttribute('stroke', col);
-  document.getElementById('trustNumber').textContent = d.score;
+  document.getElementById('trustNumber').textContent = score;
   document.getElementById('trustNumber').style.color = col;
 
-  /* trust label */
-  const desc = d.score >= 80
-    ? 'Aman untuk bertransaksi'
-    : d.score >= 50
-      ? 'Perlu kehati-hatian ekstra'
-      : 'Risiko sangat tinggi';
+  const desc = score >= 80 ? 'Aman untuk bertransaksi'
+    : score >= 50 ? 'Perlu kehati-hatian ekstra' : 'Risiko sangat tinggi';
   document.getElementById('trustDesc').textContent = desc;
 
-  /* metrics */
-  document.getElementById('metTx').textContent      = d.tx + 'x';
-  document.getElementById('metSuccess').textContent = d.successRate + '%';
-  document.getElementById('metReports').textContent = d.reports + ' laporan';
-  document.getElementById('metJoined').textContent  = d.joined;
+  document.getElementById('metTx').textContent      = (trust.total_tx || 0) + 'x';
+  document.getElementById('metSuccess').textContent = (trust.success_rate || 0) + '%';
+  document.getElementById('metReports').textContent = totalReports + ' laporan';
+  document.getElementById('metJoined').textContent  = d.joined_year;
 
-  /* factor bars */
+  const factors = trust.factors || {};
   const bl = document.getElementById('barList');
-  bl.innerHTML = d.factors.map(function(f) {
+  bl.innerHTML = Object.entries(factors).map(function([label, val]) {
+    const color = val >= 70 ? '#00ff88' : val >= 40 ? '#ffaa00' : '#ff3366';
     return '<div class="bar-row">'
-      + '<div class="bar-label">' + f.label + '</div>'
-      + '<div class="bar-track"><div class="bar-fill" style="width:' + f.val + '%;background:' + f.color + ';"></div></div>'
-      + '<div class="bar-val">' + f.val + '</div>'
+      + '<div class="bar-label">' + label + '</div>'
+      + '<div class="bar-track"><div class="bar-fill" style="width:' + val + '%;background:' + color + ';"></div></div>'
+      + '<div class="bar-val">' + val + '</div>'
       + '</div>';
   }).join('');
 
-  renderReviews(d.reviews);
+  loadReviews(d.username);
   switchTab('reviews');
 }
 
 /* ---------- RENDER UNKNOWN ---------- */
 function renderUnknown(name) {
-  currentUser = { name: name, reviews: [] };
+  currentUser = { username: name };
 
   document.getElementById('avatarEl').textContent     = '?';
   document.getElementById('profileName').textContent  = name;
@@ -193,6 +126,19 @@ function renderUnknown(name) {
   renderReviews([]);
 }
 
+/* ---------- LOAD REVIEWS DARI API ---------- */
+async function loadReviews(username) {
+  try {
+    const res = await fetch(`${API_BASE}/middlemen/${encodeURIComponent(username)}/reviews`);
+    if (res.ok) {
+      const reviews = await res.json();
+      renderReviews(reviews);
+    }
+  } catch (err) {
+    renderReviews([]);
+  }
+}
+
 /* ---------- RENDER REVIEWS ---------- */
 function renderReviews(reviews) {
   const rl = document.getElementById('reviewsList');
@@ -201,21 +147,24 @@ function renderReviews(reviews) {
     return;
   }
   rl.innerHTML = reviews.map(function(r) {
-    const stars   = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+    const stars = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+    const date  = r.created_at
+      ? new Date(r.created_at).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' })
+      : '';
     return '<div class="review-item">'
       + '<div class="review-header">'
-      +   '<span class="review-user">' + r.user + '</span>'
-      +   '<span class="review-date">' + r.date + '</span>'
+      +   '<span class="review-user">@' + r.reviewer_name + '</span>'
+      +   '<span class="review-date">' + date + '</span>'
       + '</div>'
       + '<div class="review-stars">' + stars + '</div>'
-      + '<div class="review-text">' + r.text + '</div>'
+      + '<div class="review-text">' + r.comment + '</div>'
       + '</div>';
   }).join('');
 }
 
 /* ---------- TABS ---------- */
 function switchTab(name) {
-  const tabs  = ['reviews', 'addreview', 'report'];
+  const tabs = ['reviews', 'addreview', 'report'];
   document.querySelectorAll('.tab').forEach(function(t, i) {
     t.classList.toggle('active', tabs[i] === name);
   });
@@ -233,8 +182,8 @@ function setStar(n) {
   });
 }
 
-/* ---------- SUBMIT REVIEW ---------- */
-function submitReview() {
+/* ---------- SUBMIT REVIEW ke API ---------- */
+async function submitReview() {
   const user    = document.getElementById('rvUser').value.trim();
   const comment = document.getElementById('rvComment').value.trim();
 
@@ -242,52 +191,69 @@ function submitReview() {
     alert('Lengkapi semua field terlebih dahulu.');
     return;
   }
-
-  /* add to DB if known account */
-  if (currentUser && DB[currentUser.name]) {
-    const today   = new Date();
-    const months  = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
-    const dateStr = today.getDate() + ' ' + months[today.getMonth()] + ' ' + today.getFullYear();
-    DB[currentUser.name].reviews.unshift({
-      user:  '@' + user.replace('@', ''),
-      date:  dateStr,
-      stars: selectedStar,
-      text:  comment
-    });
-    renderReviews(DB[currentUser.name].reviews);
+  if (!currentUser || !currentUser.username) {
+    alert('Cari middleman dulu sebelum memberi review.');
+    return;
   }
 
-  /* show success */
-  const successEl = document.getElementById('rvSuccess');
-  successEl.style.display = 'block';
-  setTimeout(function() { successEl.style.display = 'none'; }, 2500);
+  try {
+    const res = await fetch(`${API_BASE}/middlemen/${encodeURIComponent(currentUser.username)}/reviews`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reviewer_name: user.replace('@',''), stars: selectedStar, comment: comment })
+    });
+    if (res.ok) {
+      document.getElementById('rvSuccess').style.display = 'block';
+      setTimeout(function() { document.getElementById('rvSuccess').style.display = 'none'; }, 2500);
+      loadReviews(currentUser.username);
+    } else {
+      alert('Gagal mengirim review. Coba lagi.');
+    }
+  } catch (err) {
+    alert('Koneksi gagal. Coba lagi.');
+  }
 
-  /* reset form */
   document.getElementById('rvUser').value    = '';
   document.getElementById('rvComment').value = '';
   selectedStar = 0;
-  document.querySelectorAll('.star-btn').forEach(function(b) {
-    b.classList.remove('active');
-  });
+  document.querySelectorAll('.star-btn').forEach(function(b) { b.classList.remove('active'); });
 }
 
-/* ---------- SUBMIT REPORT ---------- */
-function submitReport() {
-  const user   = document.getElementById('rpUser').value.trim();
-  const type   = document.getElementById('rpType').value;
-  const detail = document.getElementById('rpDetail').value.trim();
+/* ---------- SUBMIT REPORT ke API ---------- */
+async function submitReport() {
+  const user    = document.getElementById('rpUser').value.trim();
+  const type    = document.getElementById('rpType').value;
+  const nominal = document.getElementById('rpNominal').value;
+  const detail  = document.getElementById('rpDetail').value.trim();
 
   if (!user || !type || !detail) {
     alert('Lengkapi semua field terlebih dahulu.');
     return;
   }
+  if (!currentUser || !currentUser.username) {
+    alert('Cari middleman dulu sebelum melaporkan.');
+    return;
+  }
 
-  /* show success */
-  const successEl = document.getElementById('rpSuccess');
-  successEl.style.display = 'block';
-  setTimeout(function() { successEl.style.display = 'none'; }, 3000);
+  try {
+    const body = { reporter_name: user.replace('@',''), report_type: type, detail: detail };
+    if (nominal) body.nominal_loss = parseFloat(nominal);
 
-  /* reset form */
+    const res = await fetch(`${API_BASE}/middlemen/${encodeURIComponent(currentUser.username)}/reports`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      document.getElementById('rpSuccess').style.display = 'block';
+      setTimeout(function() { document.getElementById('rpSuccess').style.display = 'none'; }, 3000);
+    } else {
+      alert('Gagal mengirim laporan. Coba lagi.');
+    }
+  } catch (err) {
+    alert('Koneksi gagal. Coba lagi.');
+  }
+
   document.getElementById('rpUser').value    = '';
   document.getElementById('rpType').value    = '';
   document.getElementById('rpNominal').value = '';
