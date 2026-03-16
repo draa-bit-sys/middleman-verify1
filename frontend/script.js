@@ -1,3 +1,4 @@
+const API_BASE = "https://middleman-verify1-production.up.railway.app";
 /* ============================
    MIDDLEMAN VERIFY - script.js
    ============================ */
@@ -73,19 +74,24 @@ let currentUser  = null;
 let selectedStar = 0;
 
 /* ---------- SEARCH ---------- */
-function searchMM() {
-  const q   = document.getElementById('searchInput').value.trim();
+async function searchMM() {
+  const q = document.getElementById('searchInput').value.trim();
   if (!q) return;
 
-  const key = Object.keys(DB).find(k => k.toLowerCase() === q.toLowerCase());
-  if (key) {
-    renderProfile(DB[key]);
-  } else {
+  try {
+    const res = await fetch(`${API_BASE}/middlemen/${q}`);
+    if (res.status === 404) {
+      renderUnknown(q);
+    } else {
+      const data = await res.json();
+      renderProfile(data);
+    }
+  } catch (err) {
     renderUnknown(q);
   }
 
   document.getElementById('mainContent').style.display = 'block';
-  document.getElementById('emptyState').style.display  = 'none';
+  document.getElementById('emptyState').style.display = 'none';
 }
 
 /* Enter key on search input */
