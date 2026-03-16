@@ -7,6 +7,8 @@ const API_BASE = "https://middleman-verify1-production.up.railway.app";
 
 let currentUser  = null;
 let selectedStar = 0;
+let allMiddlemen = []; // Store all middlemen for search suggestions
+let debounceTimer;
 
 /* ---- PAGE NAVIGATION ---- */
 function showPage(name) {
@@ -37,6 +39,7 @@ async function loadStats() {
     const res = await fetch(`${API_BASE}/middlemen/`);
     if (res.ok) {
       const data = await res.json();
+      allMiddlemen = data; // Store for search suggestions
       document.getElementById('statTotal').textContent = data.length;
     }
   } catch(e) {}
@@ -70,6 +73,44 @@ async function searchMM() {
 document.getElementById('searchInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') searchMM();
 });
+
+document.getElementById('searchInput').addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(showSuggestions, 300);
+});
+
+/* ---- SHOW SUGGESTIONS ---- */
+function showSuggestions() {
+  const query = document.getElementById('searchInput').value.trim().toLowerCase();
+  const suggestionsEl = document.getElementById('suggestions');
+  if (!query) {
+    suggestionsEl.innerHTML = '';
+    suggestionsEl.style.display = 'none';
+    return;
+  }
+
+  const matches = allMiddlemen.filter(mm => mm.username.toLowerCase().includes(query)).slice(0, 5); // Limit to 5
+  if (matches.length === 0) {
+    suggestionsEl.innerHTML = '';
+    suggestionsEl.style.display = 'none';
+    return;
+  }
+
+  suggestionsEl.innerHTML = matches.map(mm => `
+    <div class="suggestion-item" onclick="selectSuggestion('${mm.username}')">
+      <div class="suggestion-username">${mm.username}</div>
+      <div class="suggestion-meta">${mm.platform} · Bergabung ${mm.joined_year}</div>
+    </div>
+  `).join('');
+  suggestionsEl.style.display = 'block';
+}
+
+/* ---- SELECT SUGGESTION ---- */
+function selectSuggestion(username) {
+  document.getElementById('searchInput').value = username;
+  document.getElementById('suggestions').style.display = 'none';
+  searchMM();
+}
 
 /* ---- RENDER PROFILE ---- */
 function renderProfileFromAPI(d) {
@@ -361,3 +402,11 @@ function hideMsg(id) {
 
 /* ---- INIT ---- */
 loadStats();
+
+// Close suggestions on click outside
+document.addEventListener('click', e => {
+  const searchBar = document.querySelector('.search-bar');
+  if (!searchBar.contains(e.target)) {
+    document.getElementById('suggestions').style.display = 'none';
+  }
+});
