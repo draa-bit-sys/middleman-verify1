@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MiddlemanVerify — Cek Kepercayaan Jasa MM</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">MV</div>
+      <span class="logo-text">MiddlemanVerify</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" onclick="showPage('landing')" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Beranda
+      </a>
+      <a class="nav-item" onclick="showPage('check')" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cek Middleman
+      </a>
+      <a class="nav-item" onclick="showPage('register')" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Daftarkan MM
+      </a>
+      <a class="nav-item" onclick="showPage('update')" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Update Profil MM
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-text">v1.0.0</div>
+      <div class="api-status"><span class="status-dot"></span> Railway Connected</div>
+    </div>
+  </aside>
+
+  <div class="topbar">
+    <button class="topbar-menu" onclick="toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <span class="topbar-title">MiddlemanVerify</span>
+  </div>
+
+  <main class="main" id="main">
+
+    <!-- LANDING -->
+    <div class="page active" id="page-landing">
+      <div class="landing-hero">
+        <div class="hero-badge">🛡️ Platform Verifikasi Middleman Terpercaya</div>
+        <h1 class="hero-title">Transaksi Aman,<br/><span class="hero-accent">Tanpa Rasa Khawatir</span></h1>
+        <p class="hero-desc">Cek reputasi jasa middleman sebelum bertransaksi. Sistem trust score otomatis berdasarkan histori, review, dan laporan nyata dari komunitas.</p>
+        <div class="hero-actions">
+          <button class="btn-primary large" onclick="showPage('check')">🔍 Cek Middleman Sekarang</button>
+          <button class="btn-secondary large" onclick="showPage('register')">+ Daftarkan MM</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon blue">🔍</div>
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-label">MM Terdaftar</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">✅</div>
+          <div class="stat-num">Real-time</div>
+          <div class="stat-label">Trust Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">🚨</div>
+          <div class="stat-num">24/7</div>
+          <div class="stat-label">Laporan Aktif</div>
+        </div>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Trust Score Otomatis</h3>
+          <p>Dihitung dari 5 faktor: histori, rating, laporan negatif, usia akun, dan kelengkapan profil.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⭐</div>
+          <h3>Review Komunitas</h3>
+          <p>Kumpulkan review nyata dari para pembeli dan penjual yang pernah menggunakan jasa middleman.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🚩</div>
+          <h3>Laporan Penipuan</h3>
+          <p>Laporkan middleman yang curang. Setiap laporan mempengaruhi trust score secara langsung.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CEK MM -->
+    <div class="page" id="page-check">
+      <div class="page-header">
+        <h2 class="page-title">Cek Middleman</h2>
+        <p class="page-subtitle">Masukkan username untuk melihat trust score dan reputasi</p>
+      </div>
+      <div class="search-bar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Ketik username middleman..."/>
+        <button class="btn-primary small" onclick="searchMM()">Cek</button>
+      </div>
+
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">🔎</div>
+        <p>Masukkan username middleman untuk mulai pengecekan</p>
+      </div>
+
+      <div id="mainContent" style="display:none;">
+        <div class="profile-card">
+          <div class="profile-left">
+            <div class="avatar" id="avatarEl">—</div>
+            <div>
+              <div class="profile-name" id="profileName">—</div>
+              <div class="profile-meta" id="profileMeta">—</div>
+            </div>
+          </div>
+          <span class="badge" id="profileBadge">—</span>
+        </div>
+
+        <div id="alertBox" class="alert-box" style="display:none;">
+          <span>⚠️</span><span id="alertText"></span>
+        </div>
+
+        <div class="score-metrics-row">
+          <div class="score-card">
+            <div class="score-label">Trust Score</div>
+            <div class="score-ring-wrap">
+              <svg viewBox="0 0 110 110" width="120" height="120">
+                <circle cx="55" cy="55" r="46" fill="none" stroke="#e2e8f0" stroke-width="8"/>
+                <circle cx="55" cy="55" r="46" fill="none" stroke-width="8" stroke-linecap="round"
+                  id="trustArc" stroke-dasharray="289" stroke-dashoffset="289" stroke="#2563eb"
+                  transform="rotate(-90 55 55)"/>
+              </svg>
+              <div class="score-number" id="trustNumber">—</div>
+            </div>
+            <div class="score-desc" id="trustDesc">Belum dianalisis</div>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-label">Total Transaksi</div>
+              <div class="metric-value blue" id="metTx">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Sukses Rate</div>
+              <div class="metric-value green" id="metSuccess">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Laporan</div>
+              <div class="metric-value red" id="metReports">—</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Bergabung</div>
+              <div class="metric-value gray" id="metJoined">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-title">Analisis Faktor Kepercayaan</div>
+          <div id="barList"></div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" onclick="switchTab('reviews')">Reviews</button>
+          <button class="tab" onclick="switchTab('addreview')">Beri Rating</button>
+          <button class="tab" onclick="switchTab('report')">Laporkan</button>
+        </div>
+
+        <div id="panel-reviews" class="panel active">
+          <div class="section-card">
+            <div class="section-title">Review Terbaru</div>
+            <div id="reviewsList"></div>
+          </div>
+        </div>
+
+        <div id="panel-addreview" class="panel">
+          <div class="section-card">
+            <div class="section-title">Tambah Review</div>
+            <div class="form-row"><label class="form-label">Username Anda</label><input class="form-input" id="rvUser" placeholder="@username..."/></div>
+            <div class="form-row">
+              <label class="form-label">Rating</label>
+              <div class="stars-input">
+                <button class="star-btn" onclick="setStar(1)">★</button>
+                <button class="star-btn" onclick="setStar(2)">★</button>
+                <button class="star-btn" onclick="setStar(3)">★</button>
+                <button class="star-btn" onclick="setStar(4)">★</button>
+                <button class="star-btn" onclick="setStar(5)">★</button>
+              </div>
+            </div>
+            <div class="form-row"><label class="form-label">Komentar</label><textarea class="form-input" id="rvComment" rows="3" placeholder="Ceritakan pengalaman transaksi kamu..."></textarea></div>
+            <button class="btn-primary" onclick="submitReview()">Kirim Review</button>
+            <div id="rvSuccess" class="success-msg" style="display:none;">✅ Review berhasil ditambahkan!</div>
+          </div>
+        </div>
+
+        <div id="panel-report" class="panel">
+          <div class="section-card">
+            <div class="section-title">Laporan Penipuan</div>
+            <div class="form-row"><label class="form-label">Username Pelapor</label><input class="form-input" id="rpUser" placeholder="@username..."/></div>
+            <div class="form-row">
+              <label class="form-label">Jenis Penipuan</label>
+              <select class="form-input" id="rpType">
+                <option value="">-- Pilih Jenis --</option>
+                <option>Kabur dengan uang / barang</option>
+                <option>Barang tidak sesuai deskripsi</option>
+                <option>Tidak responsif setelah pembayaran</option>
+                <option>Identitas palsu</option>
+                <option>Double deal / scam ganda</option>
+                <option>Lainnya</option>
+              </select>
+            </div>
+            <div class="form-row"><label class="form-label">Nominal Kerugian (Rp)</label><input class="form-input" id="rpNominal" type="number" placeholder="0"/></div>
+            <div class="form-row"><label class="form-label">Detail Kejadian</label><textarea class="form-input" id="rpDetail" rows="3" placeholder="Jelaskan kronologi kejadian..."></textarea></div>
+            <button class="btn-danger" onclick="submitReport()">Kirim Laporan</button>
+            <div id="rpSuccess" class="success-msg" style="display:none;">✅ Laporan diterima. Tim kami akan meninjau dalam 24 jam.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAFTARKAN MM -->
+    <div class="page" id="page-register">
+      <div class="page-header">
+        <h2 class="page-title">Daftarkan Middleman</h2>
+        <p class="page-subtitle">Tambahkan middleman baru ke database MiddlemanVerify</p>
+      </div>
+      <div class="form-card">
+        <div class="form-row"><label class="form-label">Username <span class="required">*</span></label><input class="form-input" id="regUsername" placeholder="contoh: RajaMiddle99"/></div>
+        <div class="form-row"><label class="form-label">Platform <span class="required">*</span></label><input class="form-input" id="regPlatform" placeholder="contoh: Tokopedia / Discord"/></div>
+        <div class="form-row"><label class="form-label">Tahun Bergabung <span class="required">*</span></label><input class="form-input" id="regYear" type="number" placeholder="contoh: 2022" min="2010" max="2026"/></div>
+        <div class="form-row"><label class="form-label">Bio</label><textarea class="form-input" id="regBio" rows="3" placeholder="Deskripsi singkat tentang middleman ini..."></textarea></div>
+        <div class="form-row"><label class="form-label">Kontak</label><input class="form-input" id="regContact" placeholder="contoh: @username_wa"/></div>
+        <button class="btn-primary" onclick="registerMM()">Daftarkan Sekarang</button>
+        <div id="regSuccess" class="success-msg" style="display:none;"></div>
+        <div id="regError" class="error-msg" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- UPDATE MM -->
+    <div class="page" id="page-update">
+      <div class="page-header">
+        <h2 class="page-title">Update Profil Middleman</h2>
+        <p class="page-subtitle">Perbarui informasi profil middleman yang sudah terdaftar</p>
+      </div>
+      <div class="form-card">
+        <div class="form-row">
+          <label class="form-label">Username MM <span class="required">*</span></label>
+          <div class="input-with-btn">
+            <input class="form-input" id="updUsername" placeholder="Masukkan username..."/>
+            <button class="btn-secondary small" onclick="loadMMForUpdate()">Cari</button>
+          </div>
+        </div>
+        <div id="updateForm" style="display:none;">
+          <div class="form-row"><label class="form-label">Platform</label><input class="form-input" id="updPlatform"/></div>
+          <div class="form-row"><label class="form-label">Tahun Bergabung</label><input class="form-input" id="updYear" type="number"/></div>
+          <div class="form-row"><label class="form-label">Bio</label><textarea class="form-input" id="updBio" rows="3"></textarea></div>
+          <div class="form-row"><label class="form-label">Kontak</label><input class="form-input" id="updContact"/></div>
+          <button class="btn-primary" onclick="updateMM()">Simpan Perubahan</button>
+          <div id="updSuccess" class="success-msg" style="display:none;"></div>
+          <div id="updError" class="error-msg" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+  <script src="script.js"></script>
+</body>
+</html>
