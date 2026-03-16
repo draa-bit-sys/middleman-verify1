@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Middleman Verify</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+
+    <div class="header">
+      <div class="header-tag">// trust detection system</div>
+      <div class="header-title">MIDDLEMAN VERIFY</div>
+      <div class="header-sub">Cek reputasi jasa middleman sebelum transaksi</div>
+    </div>
+
+    <div class="search-box">
+      <input class="search-input" type="text" id="searchInput" placeholder="Masukkan username / ID middleman..." />
+      <button class="btn" onclick="searchMM()">SCAN ↗</button>
+    </div>
+
+    <div id="mainContent" style="display:none;">
+
+      <div class="card profile-card">
+        <div class="avatar" id="avatarEl">—</div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-meta" id="profileMeta">—</div>
+        </div>
+        <div>
+          <span class="profile-badge" id="profileBadge">—</span>
+        </div>
+      </div>
+
+      <div class="scan-line"></div>
+
+      <div id="alertBox" style="display:none;" class="alert-box">
+        <div class="alert-icon">⚠</div>
+        <div class="alert-text" id="alertText"></div>
+      </div>
+
+      <div class="card" style="text-align:center;">
+        <div class="card-title">Trust Score</div>
+        <div class="trust-ring" id="trustRingWrap">
+          <svg viewBox="0 0 110 110" width="110" height="110">
+            <circle cx="55" cy="55" r="46" fill="none" stroke="#1a1a28" stroke-width="8"/>
+            <circle cx="55" cy="55" r="46" fill="none" stroke-width="8" stroke-linecap="round"
+              id="trustArc" stroke-dasharray="289" stroke-dashoffset="289" stroke="#00ff88"/>
+          </svg>
+          <div class="trust-number" id="trustNumber" style="color:#00ff88">—</div>
+        </div>
+        <div class="trust-label" id="trustDesc">Belum dianalisis</div>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <div class="metric-label">Total Transaksi</div>
+          <div class="metric-value metric-cyan" id="metTx">—</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">Sukses Rate</div>
+          <div class="metric-value metric-green" id="metSuccess">—</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">Laporan Penipuan</div>
+          <div class="metric-value metric-red" id="metReports">—</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-label">Bergabung</div>
+          <div class="metric-value metric-amber" id="metJoined">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Analisis Faktor Kepercayaan</div>
+        <div id="barList"></div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('reviews')">Reviews</button>
+        <button class="tab" onclick="switchTab('addreview')">Beri Rating</button>
+        <button class="tab" onclick="switchTab('report')">Laporkan</button>
+      </div>
+
+      <!-- Panel: Reviews -->
+      <div id="panel-reviews" class="panel active">
+        <div class="card">
+          <div class="card-title">Review Terbaru</div>
+          <div id="reviewsList"></div>
+        </div>
+      </div>
+
+      <!-- Panel: Tambah Review -->
+      <div id="panel-addreview" class="panel">
+        <div class="card">
+          <div class="card-title">Tambah Review</div>
+          <div class="form-row">
+            <label class="form-label">Username Anda</label>
+            <input class="form-input" id="rvUser" placeholder="@username..." />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Rating</label>
+            <div class="stars-input" id="starsInput">
+              <button class="star-btn" onclick="setStar(1)">★</button>
+              <button class="star-btn" onclick="setStar(2)">★</button>
+              <button class="star-btn" onclick="setStar(3)">★</button>
+              <button class="star-btn" onclick="setStar(4)">★</button>
+              <button class="star-btn" onclick="setStar(5)">★</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Komentar</label>
+            <textarea class="form-textarea" id="rvComment" placeholder="Ceritakan pengalaman transaksi kamu..."></textarea>
+          </div>
+          <button class="btn btn-green" onclick="submitReview()" style="width:100%;">KIRIM REVIEW ↗</button>
+          <div id="rvSuccess" style="display:none;" class="submit-success">
+            <div class="success-icon">✓</div>
+            <div class="success-text">Review berhasil ditambahkan!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel: Laporan -->
+      <div id="panel-report" class="panel">
+        <div class="card">
+          <div class="card-title">Laporan Penipuan</div>
+          <div class="form-row">
+            <label class="form-label">Username Pelapor</label>
+            <input class="form-input" id="rpUser" placeholder="@username..." />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Jenis Penipuan</label>
+            <select class="form-select" id="rpType">
+              <option value="">-- Pilih Jenis --</option>
+              <option>Kabur dengan uang / barang</option>
+              <option>Barang tidak sesuai deskripsi</option>
+              <option>Tidak responsif setelah pembayaran</option>
+              <option>Identitas palsu</option>
+              <option>Double deal / scam ganda</option>
+              <option>Lainnya</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Nominal Kerugian (Rp)</label>
+            <input class="form-input" id="rpNominal" type="number" placeholder="0" />
+          </div>
+          <div class="form-row">
+            <label class="form-label">Detail Kejadian</label>
+            <textarea class="form-textarea" id="rpDetail" placeholder="Jelaskan kronologi kejadian secara detail..."></textarea>
+          </div>
+          <button class="btn btn-red" onclick="submitReport()" style="width:100%;">KIRIM LAPORAN ↗</button>
+          <div id="rpSuccess" style="display:none;" class="submit-success">
+            <div class="success-icon" style="color:var(--accent-amber);">!</div>
+            <div class="success-text">Laporan diterima. Tim kami akan meninjau dalam 24 jam.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="emptyState" class="empty-state" style="margin-top:16px;">
+      Masukkan username middleman untuk mulai pengecekan
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
